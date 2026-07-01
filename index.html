@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9-PLATINUM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- SCRAPBOOK AESTHETIC STYLING --- */
+        @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: white;
+            background-image: url('https://www.transparenttextures.com/patterns/lined-paper.png');
+            color: black;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+            padding-top: 90px; 
+            padding-bottom: 80px;
+            width: 100%;
+        }
+
+        /* --- HIGH ENERGY ENGINE ANIMATIONS --- */
+        @keyframes continuousFloatLeft {
+            0%, 100% { transform: rotate(var(--base-rot)) translateY(0px) translateX(0px); }
+            50% { transform: rotate(calc(var(--base-rot) + 2deg)) translateY(-8px) translateX(3px); }
+        }
+
+        @keyframes continuousFloatRight {
+            0%, 100% { transform: rotate(var(--base-rot)) translateY(0px) translateX(0px); }
+            50% { transform: rotate(calc(var(--base-rot) - 2.5deg)) translateY(-6px) translateX(-4px); }
+        }
+
+        @keyframes folderTapWiggle {
+            0% { transform: rotate(var(--base-rot)) scale(1); }
+            20% { transform: rotate(calc(var(--base-rot) - 4deg)) scale(1.03); }
+            60% { transform: rotate(calc(var(--base-rot) + 4deg)) scale(1.03); }
+            100% { transform: rotate(var(--base-rot)) scale(1); }
+        }
+
+        @keyframes paperPopBurst {
+            0% { transform: rotate(0deg) scale(0.7) translateY(-30px); opacity: 0; }
+            60% { transform: rotate(calc(var(--snippet-rot) * 1.3)) scale(1.05) translateY(3px); opacity: 0.9; }
+            100% { transform: rotate(var(--snippet-rot)) scale(1) translateY(0) translateX(var(--snippet-x)); opacity: 1; }
+        }
+
+        /* SPOTIFY-STYLE COUNTDOWN ANIMATIONS */
+        @keyframes radarPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.15); transform: scale(1); }
+            50% { box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.05); transform: scale(1.01); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.0); transform: scale(1); }
+        }
+
+        @keyframes textBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        @keyframes clockTickShudder {
+            0%, 100% { transform: rotate(-0.5deg); }
+            50% { transform: rotate(0.5deg) scale(1.01); }
+        }
+
+        /* --- CUTE HAND-DRAWN SEPARATORS --- */
+        .cute-separator {
+            text-align: center;
+            color: #b5a897;
+            font-family: 'Architects Daughter', cursive;
+            font-size: 1.2rem;
+            margin: 25px 0;
+            letter-spacing: 4px;
+            user-select: none;
+            opacity: 0.8;
+            transition: transform 0.3s ease;
+        }
+        .cute-separator:hover {
+            transform: scale(1.2) rotate(2deg);
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: #7a6f5d;
+            stroke-width: 2; 
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        /* --- TOP NAVIGATION ELEMENT --- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #fffdf9;
+            border-bottom: 1px dashed #b5a897;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .nav-logo {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #5a4a3a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* --- STREAMING MARQUEE ALERT BANNER --- */
+        .alert-bar {
+            background: none;
+            color: #000000;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 auto 30px auto;
+            width: calc(100% - 32px);
+            max-width: 1320px;
+            border: 1px dashed #e6d3b3;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .alert-bar::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            width: 70px;
+            height: 16px;
+            background: rgba(220, 200, 170, 0.4);
+            transform: rotate(-1deg);
+        }
+
+        /* --- APPLICATION ISOLATION GRID --- */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 35px;
+            padding: 0 16px;
+            max-width: 1320px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (min-width: 940px) {
+            .dashboard-container { grid-template-columns: 340px 1fr; padding: 0 40px; }
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .sidebar-panel {
+            padding: 15px 5px;
+            background: transparent;
+            position: relative;
+        }
+
+        .hero-title h1 {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #4a3e3d;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .hero-title p { 
+            font-size: 0.85rem; 
+            font-weight: 400; 
+            line-height: 1.6; 
+            color: #6e665b; 
+            font-style: italic;
+        }
+
+        /* --- SPOTIFY STYLE ALBUM COUNTDOWN BILLBOARD --- */
+        .countdown-billboard {
+            border: 2px dashed #3a322d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(253, 251, 247, 0.9);
+            position: relative;
+            animation: radarPulse 4s infinite ease-in-out;
+            transform: rotate(-0.5deg);
+            overflow: hidden;
+        }
+
+        .countdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; 
+            gap: 10px;
+        }
+
+        .radar-badge {
+            font-family: 'Architects Daughter', cursive;
+            font-weight: 900;
+            font-size: 0.85rem;
+            color: #fff;
+            background: #000;
+            padding: 4px 12px;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radar-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4747;
+            border-radius: 50%;
+            animation: textBlink 1s infinite;
+        }
+
+        .drop-date-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #7a6f5d;
+            text-transform: uppercase;
+        }
+
+        .countdown-clock-row {
+            display: flex;
+            gap: 6px; 
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .clock-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+            animation: clockTickShudder 0.9s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .clock-digits {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.2rem, 4.5vw, 2.5rem); 
+            color: #2c2520;
+            background: #fff;
+            border: 1px dashed #b5a897;
+            padding: 6px 2px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 68px;
+            text-align: center;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+        }
+
+        .clock-label {
+            font-family: 'Architects Daughter', cursive;
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
+            font-weight: 900;
+            color: #8c7e6c;
+            margin-top: 6px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .clock-divider {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 900;
+            color: #b5a897;
+            padding-bottom: 22px;
+            user-select: none;
+        }
+
+        .hype-progress-container {
+            width: 100%;
+            height: 8px;
+            border: 1px dashed #b5a897;
+            background: transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .hype-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #3a322d;
+            transition: width 1s linear;
+        }
+
+        /* --- JOURNAL STYLE MEDIA CARD PLAYER --- */
+        .media-player-card {
+            background: transparent;
+            padding: 20px 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .media-player-card::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            right: 20px;
+            width: 80px;
+            height: 20px;
+            background: rgba(181, 168, 151, 0.3);
+            transform: rotate(3deg);
+            z-index: 5;
+        }
+
+        .player-track-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            min-width: 0; 
+            overflow: hidden;
+        }
+
+        .track-artwork {
+            width: 75px;
+            height: 75px;
+            border: 1px dashed #c7bda2;
+            background: transparent;
+            object-fit: cover;
+            border-radius: 2px;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .track-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0; 
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .track-title {
+            font-family: 'Architects Daughter', cursive;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #2c2520;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .track-artist {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: #8c7e6c;
+            text-transform: uppercase;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* --- SYNCED CAPTION MONITOR --- */
+        .lyrics-container {
+            border: 1px dashed #c4b9a3; 
+            background: transparent; 
+            padding: 15px; 
+            margin-top: 5px; 
+            min-height: 75px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        #lyrics-window {
+            font-family: 'Courier Prime', monospace;
+            font-weight: 700;
+            text-align: center;
+            width: 100%;
+        }
+
+        #caption-line {
+            color: #4a433a; 
+            font-size: 0.95rem; 
+            transition: opacity 0.15s ease;
+        }
+
+        .player-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-player {
+            background: transparent;
+            border: 1px dashed #7a6f5d;
+            padding: 12px;
+            font-family: 'Architects Daughter', cursive;
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #4a3e3d;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-player:hover {
+            background: rgba(122, 111, 93, 0.1);
+        }
+
+        /* --- INPUT INTERFACE CORE --- */
+        .search-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-wrapper label {
+            font-family: 'Architects Daughter', cursive;
+            font-weight: 900;
+            font-size: 0.9rem;
+            color: #5a4a3a;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: 1px dashed #b5a897;
+            border-radius: 4px;
+            outline: none;
+            background: transparent;
+            color: #3d3a36;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        /* --- SCRAPBOOK FOLDER CARD DIRECTORY --- */
+        .grid-main {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            min-width: 0;
+            padding-top: 20px;
+        }
+
+        /* THE VISUAL PAPER FOLDER ENGINE */
+        .folder-card {
+            background: transparent;
+            width: 100%;
+            position: relative;
+            padding-top: 24px; 
+            animation: continuousFloatLeft 5.5s ease-in-out infinite alternate;
+            transform: rotate(var(--base-rot)) translateX(var(--base-x));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .folder-card:nth-child(even) {
+            animation: continuousFloatRight 4.8s ease-in-out infinite alternate;
+        }
+
+        .folder-tab {
+            position: absolute;
+            top: 0;
+            left: 15px;
+            height: 26px;
+            padding: 0 14px;
+            background: transparent;
+            border: 2px dashed #d9ceb2;
+            border-bottom: none;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 14px;
+            font-family: 'Architects Daughter', cursive;
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: #8c7e6c;
+            line-height: 24px;
+            transform: skewX(-12deg);
+            user-select: none;
+        }
+
+        .folder-header {
+            padding: 20px 14px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            border: 2px dashed #d9ceb2;
+            border-radius: 4px;
+            border-top-left-radius: 0px; 
+            gap: 10px;
+        }
+
+        .folder-header:hover { 
+            animation: folderTapWiggle 0.4s ease-in-out forwards;
+            background: rgba(250, 246, 235, 0.5); 
+        }
+
+        .folder-title-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .folder-title-area h2 {
+            font-family: 'Architects Daughter', cursive;
+            font-size: clamp(1.4rem, 5vw, 2.1rem);
+            font-weight: 900;
+            color: #3a322d;
+            word-break: break-word;
+        }
+
+        .folder-badge {
+            background: transparent;
+            color: #7a6f5d;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border: 1px dashed #b5a897;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .chevron-icon { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); flex-shrink: 0; }
+        .folder-card.active .chevron-icon { transform: rotate(180deg) scale(1.2); }
+
+        /* --- SCATTERED EXPANDABLE PAPERS --- */
+        .folder-contents {
+            max-height: 0;
+            overflow: hidden;
+            background: transparent;
+            padding-left: 5px;
+            padding-right: 5px;
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .folder-card.active .folder-contents { 
+            max-height: 4000px; 
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .snippet-row {
+            padding: 20px 25px;
+            border: 1px dashed #c4b9a3;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            opacity: 0;
+            background: transparent;
+            transform: rotate(0deg) translateX(0px);
+        }
+
+        .folder-card.active .snippet-row {
+            animation: paperPopBurst 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+            animation-delay: var(--pop-delay);
+        }
+
+        @media (min-width: 650px) {
+            .snippet-row { flex-direction: row; align-items: center; }
+        }
+
+        .snippet-row:hover { 
+            background: rgba(255, 253, 249, 0.8);
+            transform: scale(1.02) rotate(calc(var(--snippet-rot) * 0.5)) !important;
+            transition: transform 0.2s ease, background 0.2s ease;
+            z-index: 10;
+        }
+
+        .snippet-body {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.6;
+            color: #4a433a;
+            width: 100%;
+            word-break: break-word;
+        }
+
+        .meta-tags-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag-badge {
+            font-size: 0.65rem;
+            background: transparent;
+            color: #8c7e6c;
+            padding: 2px 8px;
+            font-weight: 700;
+            text-transform: lowercase;
+            border: 1px dashed #d9ceb2;
+            border-radius: 2px;
+        }
+
+        .launch-btn {
+            background: transparent;
+            border: 1px dashed #7a6f5d;
+            padding: 10px 22px;
+            font-family: 'Architects Daughter', cursive;
+            font-weight: 900;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            text-decoration: none;
+            color: #4a3e3d;
+            text-align: center;
+            width: 100%;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .launch-btn.preview-mode {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(0,0,0,0.03);
+            color: #8c7e6c;
+            border-color: #c4b9a3;
+        }
+
+        @media (min-width: 650px) {
+            .launch-btn { width: auto; }
+        }
+
+        .launch-btn:not(.preview-mode):hover {
+            background: rgba(122, 111, 93, 0.15);
+            transform: scale(1.05);
+        }
+
+        #youtube-audio-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="youtube-audio-layer"></div>
+
+    <nav class="top-nav">
+        <div class="nav-logo" id="nav-logo">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
+            9-PLATINUM
+        </div>
+    </nav>
+
+    <div class="alert-bar" id="live-alert-bar">
+        <span id="alert-text">CONNECTING TO DATABASE CORE...</span>
+    </div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-panel">
+                <div class="hero-title">
+                    <h1>WELCOME!</h1>
+                    <p>Everyone is welcome here to have access to these materials. Please use them wisely!</p>
+                </div>
+            </div>
+            
+            <div class="cute-separator">〜〜〜 ✦ ✎ ✦ 〜〜〜</div>
+
+            <div class="sidebar-panel">
+                <div class="search-wrapper">
+                    <label for="search-bar">Filter Folders</label>
+                    <input type="text" id="search-bar" class="search-input" placeholder="Search folders or tags..." oninput="processDatabaseSearch()">
+                </div>
+            </div>
+
+            <div class="cute-separator">〜〜〜 ✦ ♫ ✦ 〜〜〜</div>
+
+            <div class="media-player-card">
+                <div class="player-track-info">
+                    <img id="player-artwork" class="track-artwork" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='70' height='70'><rect width='70' height='70' fill='transparent'/></svg>" alt="Artwork">
+                    <div class="track-text">
+                        <div id="player-title" class="track-title">NO TRACK DETECTED</div>
+                        <div id="player-artist" class="track-artist">STANDBY MODE</div>
+                    </div>
+                </div>
+
+                <div class="lyrics-container">
+                    <div id="lyrics-window">
+                        <span id="caption-line">Please wait...</span>
+                    </div>
+                </div>
+
+                <div class="player-controls">
+                    <button class="btn-player" id="audio-toggle-btn" onclick="toggleAudioSystem()">
+                        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+                        <span id="audio-btn-label">PLAY ENGINE</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="grid-main">
+            <section class="countdown-billboard" id="hype-billboard">
+                <div class="countdown-header">
+                    <div class="radar-badge">
+                        <div class="radar-dot"></div> DROP RADAR
+                    </div>
+                    <div class="drop-date-title">Drops on Friday!</div>
+                </div>
+                <p style="font-family:'Architects Daughter', cursive; font-size:1.1rem; font-weight:900; color:#3a322d; margin-top: 10px;">Reviewers Release!</p>
+                
+                <div class="countdown-clock-row">
+                    <div class="clock-segment">
+                        <div class="clock-digits" id="cnt-days">00</div>
+                        <div class="clock-label">Days</div>
+                    </div>
+                    <div class="clock-divider">:</div>
+                    <div class="clock-segment">
+                        <div class="clock-digits" id="cnt-hours">00</div>
+                        <div class="clock-label">Hrs</div>
+                    </div>
+                    <div class="clock-divider">:</div>
+                    <div class="clock-segment">
+                        <div class="clock-digits" id="cnt-mins">00</div>
+                        <div class="clock-label">Min</div>
+                    </div>
+                    <div class="clock-divider">:</div>
+                    <div class="clock-segment">
+                        <div class="clock-digits" id="cnt-secs">00</div>
+                        <div class="clock-label">Sec</div>
+                    </div>
+                </div>
+                <div class="hype-progress-container">
+                    <div class="hype-progress-bar" id="hype-meter"></div>
+                </div>
+            </section>
+
+            <div id="dynamic-grid" style="display: flex; flex-direction: column; gap: 30px; width: 100%;"></div>
+        </main>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wyabsbzxcwmqmjnckwru.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_uKHKLyFSwYY54psPJsG5Sg_aIMRIbIR";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
+
+        let globalReviewersData = [];
+        let defaultMediaId = "jfKfPfyJRdk"; 
+        window.audioPlayer = null; 
+        let isAudioPlaying = false;
+        
+        let parsedLyrics = [];
+        let syncLoopInterval = null;
+
+        const DROP_TARGET_DATE = new Date("July 3, 2026 12:00:00").getTime();
+        const TOTAL_HYPE_DURATION = 2 * 24 * 60 * 60 * 1000; 
+        let systemUnlockedState = false;
+
+        // Reactive condition evaluating system access availability
+        function systemIsLive() {
+            return new Date().getTime() >= DROP_TARGET_DATE;
+        }
+
+        // Standardizing URLs to avoid local filesystem path conflicts
+        function formatAbsoluteUrl(rawUrl) {
+            if (!rawUrl) return "#";
+            let trimmed = rawUrl.trim();
+            if (/^https?:\/\//i.test(trimmed)) {
+                return trimmed;
+            }
+            return "https://" + trimmed;
+        }
+
+        function runHypeClockEngine() {
+            const now = new Date().getTime();
+            const difference = DROP_TARGET_DATE - now;
+
+            if (difference <= 0) {
+                document.getElementById('hype-billboard').innerHTML = `
+                    <div class="countdown-header">
+                        <div class="radar-badge" style="background:#ff4747;"><div class="radar-dot" style="background:#fff;"></div> LIVE NOW</div>
+                    </div>
+                    <h2 style="font-family:'Architects Daughter', cursive; font-weight:900; font-size:1.8rem; color:#ff4747; text-align:center; padding:10px 0; animation: textBlink 1.5s infinite;">
+                        🎉 ALL REVIEWERS UNLOCKED! 🎉
+                    </h2>
+                `;
+                
+                // Hot swap asset buttons instantly if live event state transitions
+                if (!systemUnlockedState) {
+                    systemUnlockedState = true;
+                    processGroupingAndRender(globalReviewersData);
+                }
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            const dEl = document.getElementById('cnt-days');
+            const hEl = document.getElementById('cnt-hours');
+            const mEl = document.getElementById('cnt-mins');
+            const sEl = document.getElementById('cnt-secs');
+
+            if(dEl) dEl.innerText = String(days).padStart(2, '0');
+            if(hEl) hEl.innerText = String(hours).padStart(2, '0');
+            if(mEl) mEl.innerText = String(minutes).padStart(2, '0');
+            if(sEl) sEl.innerText = String(seconds).padStart(2, '0');
+
+            const elapsed = TOTAL_HYPE_DURATION - difference;
+            const pct = Math.max(0, Math.min(100, (elapsed / TOTAL_HYPE_DURATION) * 100));
+            const meter = document.getElementById('hype-meter');
+            if(meter) meter.style.width = `${pct}%`;
+        }
+        setInterval(runHypeClockEngine, 1000);
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+
+        function onYouTubeIframeAPIReady() {
+            initAudioEngine(defaultMediaId);
+        }
+
+        function initAudioEngine(mediaId) {
+            if(window.audioPlayer) return; 
+            window.audioPlayer = new YT.Player('youtube-audio-layer', {
+                height: '1', width: '1', videoId: mediaId,
+                playerVars: { 
+                    'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': mediaId, 'modestbranding': 1, 'playsinline': 1 
+                },
+                events: {
+                    'onReady': (e) => { 
+                        e.target.setVolume(50);
+                        processAudioNodeDiscovery();
+                    },
+                    'onStateChange': (e) => {
+                        const label = document.getElementById('audio-btn-label');
+                        const btn = document.getElementById('audio-toggle-btn');
+                        if (e.data === YT.PlayerState.PLAYING) {
+                            isAudioPlaying = true;
+                            label.innerText = "PAUSE ENGINE";
+                            btn.querySelector('svg').innerHTML = "<path d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/>";
+                            startLyricsSync();
+                        } else {
+                            isAudioPlaying = false;
+                            label.innerText = "PLAY ENGINE";
+                            btn.querySelector('svg').innerHTML = "<path d='M8 5v14l11-7z'/>";
+                            stopLyricsSync();
+                        }
+                    }
+                }
+            });
+        }
+
+        function startLyricsSync() {
+            if (syncLoopInterval) clearInterval(syncLoopInterval);
+            syncLoopInterval = setInterval(() => {
+                if (window.audioPlayer && typeof window.audioPlayer.getCurrentTime === 'function') {
+                    const elapsedSeconds = window.audioPlayer.getCurrentTime();
+                    syncLyricsTrack(elapsedSeconds);
+                }
+            }, 150);
+        }
+
+        function stopLyricsSync() {
+            if (syncLoopInterval) { clearInterval(syncLoopInterval); syncLoopInterval = null; }
+        }
+
+        function setupManualAudioDisplay(title, artist, artworkUrl) {
+            document.getElementById('player-title').innerText = title || "Unknown Track";
+            document.getElementById('player-artist').innerText = artist || "Unknown Artist";
+            if(artworkUrl) document.getElementById('player-artwork').src = artworkUrl;
+        }
+
+        function toggleAudioSystem() {
+            if (!window.audioPlayer || typeof window.audioPlayer.playVideo !== 'function') return;
+            if (!isAudioPlaying) { window.audioPlayer.playVideo(); } else { window.audioPlayer.pauseVideo(); }
+        }
+        
+        function loadAndParseLyrics(rawLyricsStr) {
+            const captionEl = document.getElementById('caption-line');
+            if (!rawLyricsStr) {
+                if (captionEl) captionEl.innerText = "NO CAPTIONS LOADED";
+                return;
+            }
+            parsedLyrics = [];
+            const lines = rawLyricsStr.split(/\r?\n/);
+            const timeRegex = /\[(\d{2}):(\d{2})(?:\.(\d{2}))?\]/;
+
+            lines.forEach((line) => {
+                const match = timeRegex.exec(line);
+                if (match) {
+                    const minutes = parseInt(match[1], 10);
+                    const seconds = parseInt(match[2], 10);
+                    const milliseconds = match[3] ? parseInt(match[3], 10) * 10 : 0;
+                    const totalSeconds = (minutes * 60) + seconds + (milliseconds / 1000);
+                    const text = line.replace(timeRegex, '').trim();
+                    if (text) parsedLyrics.push({ time: totalSeconds, text: text });
+                }
+            });
+            if (parsedLyrics.length === 0 && captionEl) {
+                captionEl.innerText = "ERROR LOADING STREAM CAPTIONS";
+            } else if (captionEl) {
+                captionEl.innerText = "Ready";
+            }
+        }
+
+        let currentActiveLyricIndex = -1;
+        function syncLyricsTrack(currentTimeInSeconds) {
+            if (parsedLyrics.length === 0) return;
+            let activeIndex = -1;
+            for (let i = 0; i < parsedLyrics.length; i++) {
+                if (currentTimeInSeconds >= parsedLyrics[i].time) { activeIndex = i; } else { break; }
+            }
+            const captionEl = document.getElementById('caption-line');
+            if (!captionEl) return;
+
+            if (activeIndex !== currentActiveLyricIndex) {
+                currentActiveLyricIndex = activeIndex;
+                if (activeIndex !== -1) {
+                    const currentText = parsedLyrics[activeIndex].text;
+                    captionEl.style.opacity = 0; 
+                    setTimeout(() => {
+                        captionEl.innerText = currentText;
+                        captionEl.style.opacity = 1; 
+                    }, 40);
+                } else {
+                    captionEl.innerText = "Ready to caption...";
+                    captionEl.style.opacity = 1;
+                }
+            }
+        }
+
+        let clickCount = 0;
+        document.getElementById('nav-logo').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 10) { window.location.href = 'admin.html'; }
+        });
+
+        function toggleFolder(cardElement) { cardElement.classList.toggle('active'); }
+
+        function processGroupingAndRender(reviewersList) {
+            const grid = document.getElementById('dynamic-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            const filteredReviewers = reviewersList.filter(item => item.subject !== 'SYSTEM_AUDIO_NODE');
+            const groupedBySubject = {};
+
+            filteredReviewers.forEach(item => {
+                const cleanSubject = item.subject.trim().toUpperCase();
+                if (!groupedBySubject[cleanSubject]) { groupedBySubject[cleanSubject] = []; }
+                groupedBySubject[cleanSubject].push(item);
+            });
+
+            const subjects = Object.keys(groupedBySubject);
+            const liveStatus = systemIsLive(); // Access lock condition state
+
+            subjects.forEach((subjectName, folderIndex) => {
+                const itemsInFolder = groupedBySubject[subjectName];
+                const folderCard = document.createElement('div');
+                folderCard.className = 'folder-card';
+                
+                const baseRotation = (Math.random() * 9.6 - 4.8).toFixed(2);
+                const baseHorizShift = (Math.random() * 26 - 13).toFixed(0);
+                folderCard.style.setProperty('--base-rot', `${baseRotation}deg`);
+                folderCard.style.setProperty('--base-x', `${baseHorizShift}px`);
+                
+                folderCard.innerHTML = `
+                    <div class="folder-tab">VOL_${folderIndex + 1}</div>
+                    <div class="folder-header" onclick="toggleFolder(this.parentElement)">
+                        <div class="folder-title-area">
+                            <svg viewBox="0 0 24 24" style="stroke-width:2.5;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            <h2>${subjectName}</h2>
+                            <span class="folder-badge">${itemsInFolder.length} ASSETS</span>
+                        </div>
+                        <div class="chevron-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                    </div>
+                    <div class="folder-contents"></div>
+                `;
+                
+                grid.appendChild(folderCard);
+                const contentContainer = folderCard.querySelector('.folder-contents');
+                
+                itemsInFolder.forEach((item, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'snippet-row';
+                    
+                    const snippetRotation = (Math.random() * 5.4 - 2.7).toFixed(2);
+                    const snippetShiftX = (Math.random() * 18 - 9).toFixed(0);
+                    const popStaggerDelay = (index * 0.07).toFixed(2);
+
+                    row.style.setProperty('--snippet-rot', `${snippetRotation}deg`);
+                    row.style.setProperty('--snippet-x', `${snippetShiftX}px`);
+                    row.style.setProperty('--pop-delay', `${popStaggerDelay}s`);
+                    
+                    let tagsHTML = '';
+                    if (item.metadata && !item.metadata.includes('||')) {
+                        tagsHTML = `<div class="meta-tags-row">` + 
+                            item.metadata.split(',').map(t => `<span class="tag-badge">${t.trim()}</span>`).join('') + 
+                            `</div>`;
+                    }
+
+                    // Process security lockouts and direct anchor URL targeting rules
+                    const finalSanitizedUrl = formatAbsoluteUrl(item.link);
+                    const buttonControlElement = liveStatus 
+                        ? `<a class="launch-btn" href="${finalSanitizedUrl}" target="_blank">LAUNCH</a>`
+                        : `<span class="launch-btn preview-mode" title="Locked until countdown ends">PREVIEW</span>`;
+
+                    row.innerHTML = `
+                        <div class="snippet-body">
+                            <div>${item.description}</div>
+                            ${tagsHTML}
+                        </div>
+                        ${buttonControlElement}
+                    `;
+                    contentContainer.appendChild(row);
+                });
+
+                if (folderIndex < subjects.length - 1) {
+                    const midSeparator = document.createElement('div');
+                    midSeparator.className = 'cute-separator';
+                    midSeparator.innerHTML = '〜〜〜 ✨ 📑 ✨ 〜〜〜';
+                    grid.appendChild(midSeparator);
+                }
+            });
+        }
+
+        function processDatabaseSearch() {
+            const query = document.getElementById('search-bar').value.trim().toLowerCase();
+            if(!query) {
+                processGroupingAndRender(globalReviewersData);
+                return;
+            }
+
+            const filtered = globalReviewersData.filter(item => {
+                if(item.subject === 'SYSTEM_AUDIO_NODE') return false;
+                const subjectMatch = item.subject.toLowerCase().includes(query);
+                const tagsMatch = item.metadata && !item.metadata.includes('||') && item.metadata.toLowerCase().includes(query);
+                return subjectMatch || tagsMatch;
+            });
+
+            processGroupingAndRender(filtered);
+            document.querySelectorAll('.folder-card').forEach(f => f.classList.add('active'));
+        }
+
+        async function processAudioNodeDiscovery() {
+            try {
+                let { data: audioNode } = await supabaseClient
+                    .from('reviewers')
+                    .select('*')
+                    .eq('subject', 'SYSTEM_AUDIO_NODE')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (audioNode && audioNode.media_id) {
+                    if (audioNode.metadata && audioNode.metadata.includes('||')) {
+                        const parts = audioNode.metadata.split('||');
+                        setupManualAudioDisplay(parts[0], parts[1], parts[2]);
+                    }
+                    if (audioNode.description) loadAndParseLyrics(audioNode.description);
+                    if (window.audioPlayer && typeof window.audioPlayer.cueVideoById === 'function') {
+                        window.audioPlayer.cueVideoById(audioNode.media_id);
+                    }
+                }
+            } catch(err) { console.log("Audio node routing fallback.", err); }
+        }
+
+        async function bootstrapApp() {
+            try {
+                let { data: alertData } = await supabaseClient.from('system_alerts').select('text').limit(1).single();
+                if(alertData) document.getElementById('alert-text').innerHTML = alertData.text;
+
+                let { data: reviewers } = await supabaseClient.from('reviewers').select('*').order('created_at', { ascending: false });
+                
+                if(reviewers && reviewers.length > 0) {
+                    globalReviewersData = reviewers;
+                    processGroupingAndRender(globalReviewersData);
+                    await processAudioNodeDiscovery();
+                }
+
+                supabaseClient.channel('public:system_alerts')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'system_alerts' }, payload => {
+                    if (payload.new) document.getElementById('alert-text').innerHTML = payload.new.text;
+                }).subscribe();
+
+            } catch (e) { console.error(e); }
+        }
+
+        runHypeClockEngine();
+        bootstrapApp();
+    </script>
+</body>
+</html>
